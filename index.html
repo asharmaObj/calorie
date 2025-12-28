@@ -1,224 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Daily Diet Tracker</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text: #0f172a;
-            --border: #e2e8f0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Daily Diet Tracker</title>
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding-top: 100px; /* Space for fixed top header */
-            padding-bottom: 20px;
-        }
+<style>
+:root{
+  --primary:#2563eb;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --bg:#f1f5f9;
+  --card:#fff;
+  --border:#e2e8f0;
+}
 
-        .container { max-width: 500px; margin: 0 auto; padding: 0 10px; }
+body{
+  margin:0;
+  font-family:-apple-system,system-ui,sans-serif;
+  background:var(--bg);
+  padding-top:140px;
+}
 
-        /* FIXED TOP HEADER */
-        .header-fixed {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: #1e293b;
-            color: white;
-            z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+.container{max-width:520px;margin:auto;padding:0 10px}
 
-        .progress-container {
-            height: 8px;
-            background: #334155;
-            width: 100%;
-        }
+/* HEADER */
+.header-fixed{
+  position:fixed;top:0;left:0;right:0;
+  background:#1e293b;color:#fff;
+  z-index:1000;
+}
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--success);
-            transition: width 0.3s ease;
-        }
+.status-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  padding:12px;
+  text-align:center;
+  font-size:.75rem;
+}
+.stat-val{font-size:1.1rem;font-weight:700}
 
-        .status-grid {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 20px;
-            text-align: center;
-        }
+.progress-container{height:6px;background:#334155}
+.progress-bar{height:100%;width:0;background:var(--success)}
 
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
-        .stat-val { font-size: 1.2rem; font-weight: bold; }
+/* CARD */
+.card{
+  background:var(--card);
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 2px 4px rgba(0,0,0,.05);
+}
 
-        /* CARDS & TABLES */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;font-size:.75rem;border-bottom:1px solid var(--border)}
+th{text-align:left;color:#64748b}
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; font-size: 0.7rem; color: #94a3b8; padding: 10px 15px; border-bottom: 2px solid var(--border); }
-        td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
-
-        .food-name { font-weight: 600; font-size: 0.9rem; }
-        .food-meta { font-size: 0.7rem; color: #94a3b8; }
-        
-        input.qty { width: 65px; text-align: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 16px; }
-        .row-total { font-weight: bold; text-align: right; width: 60px; color: var(--primary); }
-
-        /* BOTTOM SETTINGS */
-        .settings-card { padding: 20px; background: white; border-radius: 12px; margin-top: 20px; }
-        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        label { font-size: 0.7rem; font-weight: bold; color: #64748b; }
-        .profile-grid input, .profile-grid select { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box; }
-
-        .btn-reset { width: 100%; padding: 12px; background: #f1f5f9; border: none; border-radius: 8px; color: #ef4444; font-weight: bold; margin-top: 15px; }
-    </style>
+.qty{
+  width:60px;
+  text-align:center;
+  padding:6px;
+}
+.kcal{text-align:right;font-weight:700;color:var(--primary)}
+</style>
 </head>
+
 <body>
 
+<!-- HEADER -->
 <div class="header-fixed">
-    <div class="status-grid">
-        <div class="stat-box">
-            <span class="stat-label">Target</span>
-            <span class="stat-val" id="targetVal">2050</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-label">Eaten</span>
-            <span class="stat-val" id="eatenVal" style="color: #60a5fa;">0</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-label">Remaining</span>
-            <span class="stat-val" id="leftVal" style="color: #4ade80;">2050</span>
-        </div>
-    </div>
-    <div class="progress-container">
-        <div class="progress-bar" id="pBar"></div>
-    </div>
+  <div class="status-grid">
+    <div><div>Target</div><div class="stat-val" id="targetVal">2050</div></div>
+    <div><div>Kcal</div><div class="stat-val" id="eatenVal">0</div></div>
+    <div><div>Protein</div><div class="stat-val" id="pVal">0g</div></div>
+    <div><div>Carbs</div><div class="stat-val" id="cVal">0g</div></div>
+    <div><div>Fat</div><div class="stat-val" id="fVal">0g</div></div>
+  </div>
+  <div class="progress-container">
+    <div class="progress-bar" id="pBar"></div>
+  </div>
 </div>
 
 <div class="container">
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Food Item</th>
-                    <th>Grams</th>
-                    <th style="text-align: right;">Kcal</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td><div class="food-name">Milk</div><div class="food-meta">65/100g</div></td><td><input type="number" class="qty" oninput="row(this, 65, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Oats</div><div class="food-meta">400/100g</div></td><td><input type="number" class="qty" oninput="row(this, 400, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Apple</div><div class="food-meta">60/100g</div></td><td><input type="number" class="qty" oninput="row(this, 60, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Pasta</div><div class="food-meta">200/100g</div></td><td><input type="number" class="qty" oninput="row(this, 200, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Peanuts</div><div class="food-meta">600/100g</div></td><td><input type="number" class="qty" oninput="row(this, 600, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Ice Cream</div><div class="food-meta">120/100g</div></td><td><input type="number" class="qty" oninput="row(this, 120, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Doritos</div><div class="food-meta">520/100g</div></td><td><input type="number" class="qty" oninput="row(this, 520, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Banana</div><div class="food-meta">100/100g</div></td><td><input type="number" class="qty" oninput="row(this, 100, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Cooked Rice</div><div class="food-meta">140/100g</div></td><td><input type="number" class="qty" oninput="row(this, 140, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Rice (Raw)</div><div class="food-meta">358/100g</div></td><td><input type="number" class="qty" oninput="row(this, 358, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Paneer</div><div class="food-meta">300/100g</div></td><td><input type="number" class="qty" oninput="row(this, 300, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Roti</div><div class="food-meta">~80/pc (340/100g)</div></td><td><input type="number" class="qty" oninput="row(this, 340, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Whey</div><div class="food-meta">402/100g</div></td><td><input type="number" class="qty" oninput="row(this, 402, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Grain Bread</div><div class="food-meta">125/50g</div></td><td><input type="number" class="qty" oninput="row(this, 125, 50)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Normal Bread</div><div class="food-meta">180/100g</div></td><td><input type="number" class="qty" oninput="row(this, 180, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Tofu</div><div class="food-meta">130/100g</div></td><td><input type="number" class="qty" oninput="row(this, 130, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Moong Dal</div><div class="food-meta">120/100g</div></td><td><input type="number" class="qty" oninput="row(this, 120, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Olive Oil</div><div class="food-meta">884/100g</div></td><td><input type="number" class="qty" oninput="row(this, 884, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Ghee</div><div class="food-meta">884/100g</div></td><td><input type="number" class="qty" oninput="row(this, 884, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Chia Seed</div><div class="food-meta">459/100g</div></td><td><input type="number" class="qty" oninput="row(this, 459, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Pumpkin Seed</div><div class="food-meta">446/100g</div></td><td><input type="number" class="qty" oninput="row(this, 446, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Almond</div><div class="food-meta">600/100g</div></td><td><input type="number" class="qty" oninput="row(this, 600, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Chickpea Cooked</div><div class="food-meta">250/100g</div></td><td><input type="number" class="qty" oninput="row(this, 250, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Couscous</div><div class="food-meta">357/100g</div></td><td><input type="number" class="qty" oninput="row(this, 357, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Butter</div><div class="food-meta">722/100g</div></td><td><input type="number" class="qty" oninput="row(this, 722, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Potato</div><div class="food-meta">80/100g</div></td><td><input type="number" class="qty" oninput="row(this, 80, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Chana Dal</div><div class="food-meta">380/100g</div></td><td><input type="number" class="qty" oninput="row(this, 380, 100)"></td><td class="row-total">0</td></tr>
-                <tr><td><div class="food-name">Misc</div><div class="food-meta">1 cal/g</div></td><td><input type="number" class="qty" oninput="row(this, 1, 1)"></td><td class="row-total">0</td></tr>
-            </tbody>
-        </table>
-    </div>
 
-    <div class="settings-card">
-        <h2 style="margin:0; font-size: 1rem;">Body Stats & Activity</h2>
-        <div class="profile-grid">
-            <div><label>Weight (kg)</label><input type="number" id="w" value="68" oninput="calc()"></div>
-            <div><label>Height (cm)</label><input type="number" id="h" value="167" oninput="calc()"></div>
-            <div><label>Age</label><input type="number" id="a" value="30" oninput="calc()"></div>
-            <div>
-                <label>Activity</label>
-                <select id="act" onchange="calc()">
-                    <option value="1.2">Sedentary</option>
-                    <option value="1.375">Light</option>
-                    <option value="1.55" selected>Moderate</option>
-                    <option value="1.725">Heavy</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn-reset" onclick="window.location.reload()">Reset Calculator</button>
-    </div>
+<div class="card">
+<table>
+<thead>
+<tr>
+  <th>Food</th>
+  <th>g</th>
+  <th>Kcal</th>
+</tr>
+</thead>
+<tbody id="foodTable">
+
+<tr data-cal="65" data-p="3.4" data-c="5" data-f="3.6"><td>Milk</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="400" data-p="17" data-c="66" data-f="7"><td>Oats</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="60" data-p="0.3" data-c="14" data-f="0.2"><td>Apple</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="200" data-p="7" data-c="40" data-f="1"><td>Pasta</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="600" data-p="26" data-c="16" data-f="49"><td>Peanuts</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="120" data-p="3" data-c="20" data-f="3"><td>Ice Cream</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="520" data-p="7" data-c="53" data-f="33"><td>Doritos</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="100" data-p="1.1" data-c="23" data-f="0.3"><td>Banana</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="140" data-p="2.7" data-c="28" data-f="0.3"><td>Cooked Rice</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="358" data-p="7.5" data-c="78" data-f="0.7"><td>Rice (Raw)</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="300" data-p="18" data-c="6" data-f="22"><td>Paneer</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="340" data-p="9" data-c="70" data-f="3"><td>Roti</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="402" data-p="80" data-c="7" data-f="6"><td>Whey</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="125" data-p="5" data-c="22" data-f="2"><td>Grain Bread</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="180" data-p="6" data-c="36" data-f="3"><td>Normal Bread</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="130" data-p="15" data-c="4" data-f="8"><td>Tofu</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="120" data-p="7" data-c="20" data-f="1"><td>Moong Dal</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="884" data-p="0" data-c="0" data-f="100"><td>Olive Oil</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="884" data-p="0" data-c="0" data-f="100"><td>Ghee</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="459" data-p="17" data-c="42" data-f="31"><td>Chia Seed</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="446" data-p="30" data-c="11" data-f="49"><td>Pumpkin Seed</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="600" data-p="21" data-c="22" data-f="50"><td>Almond</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="250" data-p="9" data-c="40" data-f="4"><td>Chickpea Cooked</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="357" data-p="13" data-c="77" data-f="1"><td>Couscous</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="722" data-p="1" data-c="0" data-f="81"><td>Butter</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="80" data-p="2" data-c="17" data-f="0.1"><td>Potato</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="380" data-p="22" data-c="60" data-f="6"><td>Chana Dal</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+<tr data-cal="1" data-p="0" data-c="0" data-f="0"><td>Misc</td><td><input class="qty" type="number" oninput="row(this)"></td><td class="kcal">0</td></tr>
+
+</tbody>
+</table>
+</div>
+
 </div>
 
 <script>
-    let goal = 2050;
+let goal=2050;
 
-    function calc() {
-        let weight = parseFloat(document.getElementById('w').value) || 0;
-        let height = parseFloat(document.getElementById('h').value) || 0;
-        let age = parseFloat(document.getElementById('a').value) || 0;
-        let activity = parseFloat(document.getElementById('act').value);
-        
-        let bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        let tdee = bmr * activity;
-        goal = Math.round(tdee - 400); 
-        
-        document.getElementById('targetVal').innerText = goal;
-        update();
-    }
+function row(input){
+  const tr=input.closest("tr");
+  const g=+input.value||0;
 
-    function row(input, cal, base) {
-        let grams = parseFloat(input.value) || 0;
-        input.parentElement.nextElementSibling.innerText = Math.round((grams / base) * cal);
-        update();
-    }
+  const kcal=tr.dataset.cal*g/100;
+  tr.querySelector(".kcal").innerText=Math.round(kcal);
 
-    function update() {
-        let sums = document.querySelectorAll('.row-total');
-        let eaten = 0;
-        sums.forEach(s => eaten += parseInt(s.innerText) || 0);
-        
-        let left = goal - eaten;
-        let pct = Math.min((eaten / goal) * 100, 100);
-        
-        document.getElementById('eatenVal').innerText = eaten;
-        document.getElementById('leftVal').innerText = left;
-        
-        let bar = document.getElementById('pBar');
-        bar.style.width = pct + "%";
-        
-        if (left < 0) {
-            bar.style.backgroundColor = "var(--danger)";
-            document.getElementById('leftVal').style.color = "var(--danger)";
-        } else {
-            bar.style.backgroundColor = "var(--success)";
-            document.getElementById('leftVal').style.color = "#4ade80";
-        }
-    }
-    calc();
+  tr.dataset.tp=tr.dataset.p*g/100;
+  tr.dataset.tc=tr.dataset.c*g/100;
+  tr.dataset.tf=tr.dataset.f*g/100;
+
+  updateTotals();
+}
+
+function updateTotals(){
+  let kcal=0,p=0,c=0,f=0;
+  document.querySelectorAll("#foodTable tr").forEach(r=>{
+    kcal+=+r.querySelector(".kcal").innerText||0;
+    p+=+r.dataset.tp||0;
+    c+=+r.dataset.tc||0;
+    f+=+r.dataset.tf||0;
+  });
+
+  eatenVal.innerText=kcal;
+  pVal.innerText=p.toFixed(1)+"g";
+  cVal.innerText=c.toFixed(1)+"g";
+  fVal.innerText=f.toFixed(1)+"g";
+
+  pBar.style.width=Math.min(kcal/goal*100,100)+"%";
+}
 </script>
 
 </body>
